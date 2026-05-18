@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  UC // Usuário Comum (Paciente)
+  UP // Usuário Premium (Clínica/Laboratório)
+  UE // Usuário Empresarial (Gestor)
+  UA // Administrador
+}
+
+enum AppointmentStatus {
+  agendado
+  concluido
+  cancelado
+}
+
+model User {
+  id               String   @id @default(uuid())
+  name             String
+  email            String   @unique
+  password         String
+  role             UserRole @default(UC)
+  cpf              String?  @unique
+  phone            String?
+  // Endereço granular
+  cep              String?
+  street           String?
+  number           String?
+  neighborhood     String?
+  city             String?
+  state            String?
+  
+  cnpj             String?
+  institutionName  String?
+  organizationName String?
+  active           Boolean  @default(true)
+  
+  // Recuperação de senha
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  appointments    Appointment[] @relation("PatientAppointments")
+  institutions    Institution[] @relation("ManagedBy")
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id])
+}
+
+model Organization {
+  id          String   @id @default(uuid())
+  name        String
+  cnpj        String   @unique
+  address     String?
+  phone       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  users        User[]
+  institutions Institution[]
+}
+
+model Institution {
+  id          String   @id @default(uuid())
+  name        String
+  cnpj        String   @unique
+  type        String   // 'clinica' | 'laboratorio' | 'hospital'
+  // Endereço granular
+  cep          String
+  street       String
+  number       String
+  neighborhood String
+  city         String
+  state        String
+  phone       String
+  description String?
+  specialties String[] 
+  rating      Float    @default(0)
+  image       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relacionamentos
+  managerId      String
+  manager        User          @relation("ManagedBy", fields: [managerId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  services       Service[]
+  appointments   Appointment[]
+  availability   Availability[]
+}
+
+model Availability {
+  id               String   @id @default(uuid())
+  dayOfWeek        String   // 'segunda', 'terca', etc.
+  startTime        String   // '08:00'
+  endTime          String   // '18:00'
+  interval         Int      @default(30)
+  maxAppointments  Int      @default(10)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Relacionamentos
+  institutionId    String
+  institution      Institution @relation(fields: [institutionId], references: [id])
+}
+
+model Service {
+  id            String   @id @default(uuid())
+  name          String
+  type          String   // 'consulta' | 'exame'
+  price         Float
+  duration      String   // ex: '45 min'
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relacionamentos
+  institutionId String
+  institution   Institution @relation(fields: [institutionId], references: [id])
+  appointments  Appointment[]
+  timeSlots     TimeSlot[]
+}
+
+model TimeSlot {
+  id            String   @id @default(uuid())
+  date          DateTime
+  time          String
+  available     Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relacionamentos
+  serviceId     String
+  service       Service  @relation(fields: [serviceId], references: [id])
+}
+
+model Appointment {
+  id            String            @id @default(uuid())
+  date          DateTime
+  time          String            // ex: '08:00'
+  status        AppointmentStatus @default(agendado)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+
+  // Relacionamentos
+  patientId     String
+  patient       User              @relation("PatientAppointments", fields: [patientId], references: [id])
+  institutionId String
+  institution   Institution       @relation(fields: [institutionId], references: [id])
+  serviceId     String
+  service       Service           @relation(fields: [serviceId], references: [id])
+}
