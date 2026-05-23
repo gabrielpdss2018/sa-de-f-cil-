@@ -46,3 +46,41 @@ test("AppointmentService.create cria agendamento e bloqueia horario na mesma tra
   assert.deepEqual(calls, ["appointment.create", "timeSlot.updateMany"]);
 });
 
+test("AppointmentService.cancel restaura horario e muda status do agendamento", async () => {
+  const calls: string[] = [];
+  const mockAppointment = {
+    id: "app-1",
+    serviceId: "srv-1",
+    time: "10:00",
+    date: new Date()
+  };
+
+  const tx = {
+    appointment: {
+      findUnique: async () => mockAppointment,
+      update: async (args: any) => {
+        calls.push("appointment.update");
+        assert.equal(args.data.status, "cancelado");
+        return { ...mockAppointment, status: "cancelado" };
+      }
+    },
+    timeSlot: {
+      updateMany: async (args: any) => {
+        calls.push("timeSlot.updateMany");
+        assert.equal(args.where.serviceId, "srv-1");
+        assert.equal(args.where.time, "10:00");
+        assert.equal(args.data.available, true);
+        return { count: 1 };
+      }
+    }
+  };
+
+  setPrismaMethod("$transaction", async (callback: any) => callback(tx));
+
+  const service = new AppointmentService();
+  await service.cancel("app-1");
+
+  assert.deepEqual(calls, ["appointment.update", "timeSlot.updateMany"]);
+});
+
+

@@ -79,3 +79,59 @@ test("AuthService.login rejeita senha invalida", async () => {
   );
 });
 
+test("AuthService.register cria usuario UC com sucesso", async () => {
+  let capturedData: any = null;
+  setPrismaModel("user", {
+    findUnique: async () => null,
+    create: async (args: any) => {
+      capturedData = args.data;
+      return { id: "new-id", ...args.data };
+    }
+  });
+
+  // Mock transaction
+  const { setPrismaMethod } = await import("./helpers/prismaMock.js");
+  setPrismaMethod("$transaction", async (callback: any) => {
+    return callback({
+      user: {
+        findUnique: async () => null,
+        create: async (args: any) => {
+          capturedData = args.data;
+          return { id: "new-id", ...args.data };
+        }
+      }
+    });
+  });
+
+  const service = new AuthService();
+  const result = await service.register({
+    email: "novo@email.com",
+    password: "password123",
+    name: "Novo Usuario",
+    role: "UC"
+  });
+
+  assert.equal(result.email, "novo@email.com");
+  assert.equal(capturedData.role, "UC");
+  assert.ok(capturedData.password.length > 20); // Hash
+});
+
+test("AuthService.updateProfile atualiza senha se fornecida", async () => {
+  let capturedData: any = null;
+  setPrismaModel("user", {
+    update: async (args: any) => {
+      capturedData = args.data;
+      return { id: "user-1", ...args.data };
+    }
+  });
+
+  const service = new AuthService();
+  await service.updateProfile("user-1", {
+    password: "nova-senha",
+    name: "Nome Atualizado"
+  });
+
+  assert.equal(capturedData.name, "Nome Atualizado");
+  assert.ok(capturedData.password.startsWith("$2a$") || capturedData.password.startsWith("$2b$"));
+});
+

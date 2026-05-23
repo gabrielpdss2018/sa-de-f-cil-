@@ -24,6 +24,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.ts',
+  },
   resolve: {
     alias: {
       // Alias @ to the src directory

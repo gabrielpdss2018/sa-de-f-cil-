@@ -17,7 +17,7 @@ import { toast } from "sonner";
 type ProfileType = "UC" | "UP" | "UE";
 
 export function Cadastro() {
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const [profileType, setProfileType] = useState<ProfileType>("UC");
   const [formData, setFormData] = useState({
     // Campos comuns

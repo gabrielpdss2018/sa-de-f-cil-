@@ -50,3 +50,34 @@ test("ServiceService.delete remove horarios antes de deletar servico", async () 
   assert.deepEqual(calls, ["timeSlot.deleteMany", "service.delete"]);
 });
 
+test("ServiceService.getById retorna servico com timeSlots disponiveis", async () => {
+  let capturedWhere: any = null;
+  setPrismaModel("service", {
+    findUnique: async (args: any) => {
+      capturedWhere = args.include.timeSlots.where;
+      return { id: "s1", name: "Servico", timeSlots: [] };
+    }
+  });
+
+  const service = new ServiceService();
+  await service.getById("s1");
+
+  assert.equal(capturedWhere.available, true);
+});
+
+test("ServiceService.getByInstitution retorna todos os servicos da instituicao", async () => {
+  let capturedWhere: any = null;
+  setPrismaModel("service", {
+    findMany: async (args: any) => {
+      capturedWhere = args.where;
+      return [];
+    }
+  });
+
+  const service = new ServiceService();
+  await service.getByInstitution("inst-1");
+
+  assert.equal(capturedWhere.institutionId, "inst-1");
+});
+
+

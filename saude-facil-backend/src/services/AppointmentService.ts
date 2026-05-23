@@ -69,6 +69,32 @@ export class AppointmentService {
       data: { status: status as AppointmentStatus },
     });
   }
+
+  async cancel(id: string) {
+    return prisma.$transaction(async (tx) => {
+      const appointment = await tx.appointment.findUnique({
+        where: { id },
+      });
+
+      if (!appointment) throw new Error("Agendamento não encontrado");
+
+      const updated = await tx.appointment.update({
+        where: { id },
+        data: { status: AppointmentStatus.cancelado },
+      });
+
+      await tx.timeSlot.updateMany({
+        where: {
+          serviceId: appointment.serviceId,
+          date: appointment.date,
+          time: appointment.time,
+        },
+        data: { available: true },
+      });
+
+      return updated;
+    });
+  }
 }
 
 export default new AppointmentService();
