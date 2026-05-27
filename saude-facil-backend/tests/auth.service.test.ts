@@ -27,7 +27,7 @@ test("AuthService.login retorna usuario sem senha e token JWT valido", async () 
   assert.equal(typeof result.token, "string");
 
   const decoded = jwt.verify(result.token, process.env.JWT_SECRET || "fallback_secret") as any;
-  assert.equal(decoded.id, "user-1");
+  assert.equal(decoded.userId, "user-1");
   assert.equal(decoded.role, "UC");
 });
 

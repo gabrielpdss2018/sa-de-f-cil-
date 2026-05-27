@@ -5,7 +5,7 @@ import { authMiddleware, roleMiddleware } from "../middlewares/auth.js";
 const router = Router();
 
 router.use(authMiddleware);
-router.use(roleMiddleware(["UE"]));
+router.use(roleMiddleware(["UE", "UA"]));
 
 router.get("/units", EnterpriseController.getUnits);
 router.get("/appointments", EnterpriseController.getAppointments);
