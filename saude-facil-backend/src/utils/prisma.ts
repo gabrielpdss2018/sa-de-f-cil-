@@ -13,4 +13,4 @@ const prisma = new PrismaClient({ adapter });
 
 export default prisma;
 export * from "../generated/prisma/client.js";
-export * from "../generated/prisma/enums.js";
+// Enums are typically exported from the main client file as well
