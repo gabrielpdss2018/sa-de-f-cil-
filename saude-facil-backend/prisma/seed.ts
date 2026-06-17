@@ -1,18 +1,11 @@
-import { PrismaClient } from '../src/generated/prisma/client.js';
-import { UserRole, AppointmentStatus } from '../src/generated/prisma/enums.js';
-import { PrismaPg } from '@prisma/adapter-pg';
-import pg from 'pg';
+import { PrismaClient, UserRole, AppointmentStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const connectionString = process.env.DATABASE_URL;
-const pool = new pg.Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
+  console.log('Starting seed...');
+
   // 1. Limpar dados existentes
   await prisma.appointment.deleteMany();
   await prisma.timeSlot.deleteMany();
