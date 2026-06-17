@@ -33,7 +33,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromStack:
+        fromService:
           type: web
           name: saude-facil-backend
           property: url
