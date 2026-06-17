@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "prisma generate && prisma migrate deploy && tsc",
     "start": "node dist/index.js",
     "seed": "prisma db seed",
     "test": "node --test --import tsx tests/**/*.test.ts",
