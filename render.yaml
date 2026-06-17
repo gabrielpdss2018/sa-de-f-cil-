@@ -32,10 +32,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: saude-facil-backend
-          property: hostport
+        value: https://saude-facil-backend.onrender.com
     routes:
       - type: rewrite
         source: /*
