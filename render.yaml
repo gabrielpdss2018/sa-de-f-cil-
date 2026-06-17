@@ -36,7 +36,7 @@ services:
         fromService:
           type: web
           name: saude-facil-backend
-          property: url
+          property: hostport
     routes:
       - type: rewrite
         source: /*
