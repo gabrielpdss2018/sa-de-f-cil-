@@ -26,11 +26,11 @@ services:
   # 2. Frontend (React/Vite)
   - type: web
     name: saude-facil-frontend
-    env: static
+    runtime: static
     plan: free
     rootDir: saude-facil-front-end
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromStack:
