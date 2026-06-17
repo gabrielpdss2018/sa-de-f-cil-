@@ -8,7 +8,7 @@ services:
   # 1. Backend (API Node.js)
   - type: web
     name: saude-facil-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: saude-facil-backend
     buildCommand: npm install && npm run build
