@@ -30,7 +30,7 @@ services:
     plan: free
     rootDir: saude-facil-front-end
     buildCommand: npm install && npm run build
-    publishPath: ./dist
+    publishPath: dist
     envVars:
       - key: VITE_API_URL
         fromStack:
