@@ -10,7 +10,7 @@ export class AuthService {
     const { email, password, name, role, organizationName, cnpj, ...rest } =
       data;
 
-    const hashedPassword = await bcrypt.hash(password, 8);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     return prisma.$transaction(async (tx) => {
       // Verificar se email já existe
