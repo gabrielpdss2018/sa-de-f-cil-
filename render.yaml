@@ -1,12 +1,11 @@
-services:
-  # 1. Banco de Dados PostgreSQL
-  - type: database
-    name: saude-facil-db
+databases:
+  - name: saude-facil-db
     databaseName: saude_facil
     user: saude_user
     plan: free
 
-  # 2. Backend (API Node.js)
+services:
+  # 1. Backend (API Node.js)
   - type: web
     name: saude-facil-backend
     env: node
@@ -24,7 +23,7 @@ services:
       - key: NODE_ENV
         value: production
 
-  # 3. Frontend (React/Vite)
+  # 2. Frontend (React/Vite)
   - type: web
     name: saude-facil-frontend
     env: static
