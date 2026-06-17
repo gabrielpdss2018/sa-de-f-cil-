@@ -24,8 +24,9 @@ services:
         value: production
 
   # 2. Frontend (React/Vite)
-  - type: static
+  - type: web
     name: saude-facil-frontend
+    env: static
     plan: free
     rootDir: saude-facil-front-end
     buildCommand: npm install && npm run build
